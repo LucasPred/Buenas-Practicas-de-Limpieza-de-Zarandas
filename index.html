@@ -497,7 +497,7 @@
             <div id="tab-simulator" class="tab-pane active">
                 <div class="simulation-viewport">
                     <div class="viewport-header">
-                        <h3>Simulación Deck Rectangular Tecmaq (Cursor con Cepillo Emulado)</h3>
+                        <h3>Simulación Deck Rectangular Tecmaq (Desgaste Real por Cepillo de Acero)</h3>
                         <div class="toolbar">
                             <span style="font-size: 0.8rem; color: var(--text-muted);">Herramienta:</span>
                             <button class="tool-btn active" id="tool-poly" onclick="setTool('polimero')">Polímero Suave</button>
@@ -511,7 +511,7 @@
                         <canvas id="simCanvas"></canvas>
                     </div>
                     <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">
-                        Instrucciones: El cursor adopta la forma de la herramienta seleccionada. Limpie los puntos rojos de colmatación en la malla y bordes de bastidor. Evite el cepillo de acero para no dañar los hilos AISI 304.
+                        Instrucciones: Al pasar el cepillo de acero sobre la malla, el acero AISI 304 sufre fatiga abrasiva severa (rotura de hilos y deformación visual real). Use polímeros o bronce para limpieza segura.
                     </div>
                 </div>
 
@@ -696,7 +696,7 @@
             document.getElementById('bar-rubber').style.background = 'var(--success)';
         }
 
-        // Simulación Gráfica en Canvas con cursor emulado de cepillo/herramienta
+        // Simulación Gráfica en Canvas con cursor emulado de cepillo y desgaste real progresivo en hilos de malla
         let canvas, ctx;
         let currentTool = 'polimero'; // polimero, bronce, plastico, acero
         let meshNodes = [];
@@ -759,7 +759,8 @@
                         x: startX + c * spacingX,
                         y: startY + r * spacingY,
                         clogged: clogged,
-                        damaged: false,
+                        wearLevel: 0.0, // Nivel de desgaste real (0.0 a 1.0)
+                        broken: false,   // Rotura total del hilo por fricción excesiva de acero
                         isEdge: isEdge,
                         col: c,
                         row: r
@@ -801,12 +802,18 @@
         function performToolAction() {
             meshNodes.forEach(node => {
                 let dist = Math.hypot(node.x - mouseX, node.y - mouseY);
-                if(dist < 25) {
+                if(dist < 28) {
                     if(currentTool === 'polimero' || currentTool === 'bronce' || currentTool === 'plastico') {
+                        // Limpieza efectiva sin daño estructural
                         if(node.clogged) node.clogged = false;
                     } else if(currentTool === 'acero') {
-                        node.damaged = true;
-                        node.clogged = false;
+                        // El cepillo de acero remueve obstrucción pero acumula desgaste destructivo real (abrasión en hilos AISI 304)
+                        if(node.clogged) node.clogged = false;
+                        node.wearLevel += 0.08; // Incremento progresivo de daño por pasada
+                        if(node.wearLevel >= 1.0) {
+                            node.wearLevel = 1.0;
+                            node.broken = true; // Rotura definitiva del hilo de malla
+                        }
                     }
                 }
             });
@@ -830,30 +837,43 @@
 
             let vOffset = Math.sin(timeAcc * (simulationParams.rpm / 100)) * simulationParams.amp;
 
-            // Dibujar mallas y colmataciones
+            // Dibujar tejido de malla y estado de desgaste real de los hilos
             meshNodes.forEach(node => {
                 let currentY = node.y + vOffset;
                 
-                ctx.strokeStyle = node.damaged ? 'var(--danger)' : '#334155';
-                ctx.lineWidth = node.damaged ? 1.5 : 1;
-                ctx.strokeRect(node.x - 8, currentY - 8, 16, 16);
-
-                ctx.beginPath();
-                ctx.arc(node.x, currentY, node.isEdge ? 5 : 4, 0, Math.PI * 2);
-                
-                if(node.damaged) {
-                    ctx.fillStyle = 'var(--danger)';
-                } else if(node.clogged) {
-                    ctx.fillStyle = '#ef4444'; // Puntos rojos de colmatación
+                if(node.broken) {
+                    // Hilo cortado / abierto por fricción severa de acero
+                    ctx.strokeStyle = '#ef4444';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(node.x - 6, currentY - 6);
+                    ctx.lineTo(node.x + 6, currentY + 6);
+                    ctx.moveTo(node.x + 6, currentY - 6);
+                    ctx.lineTo(node.x - 6, currentY + 6);
+                    ctx.stroke();
                 } else {
-                    ctx.fillStyle = 'var(--secondary)';
-                }
-                ctx.fill();
+                    // Gradación de color por desgaste real acumulado (de gris acero a naranja/rojo fatiga)
+                    let strokeColor = '#334155';
+                    if(node.wearLevel > 0.6) strokeColor = '#ef4444';
+                    else if(node.wearLevel > 0.3) strokeColor = '#f59e0b';
+                    
+                    ctx.strokeStyle = strokeColor;
+                    ctx.lineWidth = 1 + (node.wearLevel * 1.5); // Adelgazamiento visual de la estructura del hilo
+                    ctx.strokeRect(node.x - (8 - node.wearLevel * 3), currentY - (8 - node.wearLevel * 3), 16 - (node.wearLevel * 6), 16 - (node.wearLevel * 6));
 
-                if(node.isEdge && node.clogged) {
-                    ctx.strokeStyle = '#f59e0b';
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(node.x - 10, currentY - 10, 20, 20);
+                    ctx.beginPath();
+                    ctx.arc(node.x, currentY, Math.max(2, 4 - node.wearLevel * 2), 0, Math.PI * 2);
+                    
+                    if(node.clogged) {
+                        ctx.fillStyle = '#ef4444'; // Puntos rojos de colmatación
+                    } else if(node.wearLevel > 0.6) {
+                        ctx.fillStyle = '#ef4444';
+                    } else if(node.wearLevel > 0.3) {
+                        ctx.fillStyle = '#f59e0b';
+                    } else {
+                        ctx.fillStyle = 'var(--secondary)';
+                    }
+                    ctx.fill();
                 }
             });
 
