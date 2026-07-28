@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Avanzado de Tamizado y Limpieza - Estándar Tecmaq 0.9</title>
+    <style>
+        :root {
+            --primary: #1e293b;
+            --secondary: #0ea5e9;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-bottom: 2px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-area h1 {
+            font-size: 1.25rem;
+            color: var(--secondary);
+            font-weight: 700;
+        }
+
+        .logo-area p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .user-status {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .badge {
+            background: rgba(14, 165, 233, 0.1);
+            color: var(--secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            border: 1px solid var(--secondary);
+        }
+
+        /* Pantalla de Login */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .login-card h2 {
+            margin-bottom: 1.5rem;
+            color: var(--secondary);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #0284c7;
+        }
+
+        /* Contenedor Principal App */
+        #app-container {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+        }
+
+        nav.app-nav {
+            background: #111827;
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.75rem 2rem;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .nav-tab.active, .nav-tab:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+
+        @media(max-width: 1024px) {
+            .tab-pane.active {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panel de Simulación Visual */
+        .simulation-viewport {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .viewport-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 450px;
+            background: #090d16;
+            border-radius: 0.5rem;
+            position: relative;
+            cursor: crosshair;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Controles Herramientas */
+        .toolbar {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            align-items: center;
+        }
+
+        .tool-btn {
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .tool-btn.active {
+            background: var(--secondary);
+            border-color: var(--secondary);
+            color: white;
+        }
+
+        /* Panel de Control Cinemático y Métricas */
+        .control-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .panel-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+
+        .panel-card h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .control-slider-group {
+            margin-bottom: 1rem;
+        }
+
+        .control-slider-group label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-muted);
+        }
+
+        .control-slider-group input[type="range"] {
+            width: 100%;
+            accent-color: var(--secondary);
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .metric-box {
+            background: var(--bg);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .metric-box span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .metric-box strong {
+            font-size: 1.15rem;
+            color: var(--text);
+        }
+
+        /* Micrositio IA Diagnóstico */
+        .full-width-pane {
+            grid-column: 1 / -1;
+        }
+
+        .ai-upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 1rem;
+            padding: 3rem;
+            text-align: center;
+            background: var(--bg);
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .ai-upload-zone:hover {
+            border-color: var(--secondary);
+        }
+
+        .ai-results {
+            margin-top: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .ai-card {
+            background: var(--bg);
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background: var(--border);
+            border-radius: 9999px;
+            height: 0.75rem;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--success);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PANTALLA DE LOGIN RESTRINGIDO -->
+    <div id="login-screen">
+        <div class="login-card">
+            <h2>Acceso Operativo Tecmaq</h2>
+            <p style="text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Ingrese credenciales autorizadas para operar la simulación de granulometría 0.9</p>
+            <div class="form-group">
+                <label>Nombre de Usuario</label>
+                <input type="text" id="username" placeholder="Ej: operario.tecnico" value="operario.tecnico">
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" id="password" placeholder="••••••••" value="tecmaq0.9">
+            </div>
+            <button class="btn" onclick="handleLogin()">Ingresar al Simulador</button>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL DE LA APLICACIÓN -->
+    <div id="app-container">
+        <header>
+            <div class="logo-area">
+                <h1>SIMULADOR INDUSTRIAL TECMAQ 0.9</h1>
+                <p>Cinética de Tamizado, Dinámica de Mallas y Protocolos de Limpieza</p>
+            </div>
+            <div class="user-status">
+                <span class="badge" id="user-role-badge">Operario: Autorizado</span>
+                <button class="tool-btn" onclick="handleLogout()" style="background: transparent; border-color: var(--danger); color: var(--danger);">Salir</button>
+            </div>
+        </header>
+
+        <nav class="app-nav">
+            <button class="nav-tab active" onclick="switchTab('simulator')">Simulador de Zaranda y Limpieza</button>
+            <button class="nav-tab" onclick="switchTab('ai-inspector')">Inspección IA de Mallas y Gomas</button>
+            <button class="nav-tab" onclick="switchTab('manual-ref')">Fundamentos de Manual Técnico</button>
+        </nav>
+
+        <div class="main-content">
+            <!-- TAB 1: SIMULADOR INTERACTIVO -->
+            <div id="tab-simulator" class="tab-pane active">
+                <div class="simulation-viewport">
+                    <div class="viewport-header">
+                        <h3>Simulación en Tiempo Real - Deck de Zaranda Rectangular</h3>
+                        <div class="toolbar">
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">Herramienta:</span>
+                            <button class="tool-btn active" id="tool-poly" onclick="setTool('polimero')">Polímero Suave</button>
+                            <button class="tool-btn" id="tool-bronze" onclick="setTool('bronce')">Peine Bronce</button>
+                            <button class="tool-btn" id="tool-steel" onclick="setTool('acero')" style="border-color: var(--danger); color: var(--danger);">⚠️ Cepillo Acero</button>
+                        </div>
+                    </div>
+                    
+                    <div id="canvas-container">
+                        <canvas id="simCanvas"></canvas>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+                        Instrucciones: Seleccione herramienta y haga clic/arrastre sobre los puntos de colmatación (granos rojos) en la malla. Observe cómo las herramientas indebidas (acero) deforman el hilo.
+                    </div>
+                </div>
+
+                <div class="control-sidebar">
+                    <div class="panel-card">
+                        <h3>Parámetros Cinemáticos</h3>
+                        <div class="control-slider-group">
+                            <label><span>Frecuencia (RPM):</span> <strong id="val-rpm">1350</strong></label>
+                            <input type="range" id="range-rpm" min="950" max="1450" value="1350" oninput="updateCinematics()">
+                        </div>
+                        <div class="control-slider-group">
+                            <label><span>Amplitud órbita (mm):</span> <strong id="val-amp">2.5</strong></label>
+                            <input type="range" id="range-amp" min="2.0" max="4.5" step="0.1" value="2.5" oninput="updateCinematics()">
+                        </div>
+                        <div class="control-slider-group">
+                            <label><span>Pendiente Deck (°):</span> <strong id="val-slope">3.0</strong></label>
+                            <input type="range" id="range-slope" min="2.0" max="8.0" step="0.5" value="3.0" oninput="updateCinematics()">
+                        </div>
+                    </div>
+
+                    <div class="panel-card">
+                        <h3>Indicadores de Rendimiento</h3>
+                        <div class="metric-grid">
+                            <div class="metric-box">
+                                <span>Coef. Lanzamiento (Kv)</span>
+                                <strong id="metric-kv">3.85</strong>
+                            </div>
+                            <div class="metric-box">
+                                <span>Uniformidad Top</span>
+                                <strong id="metric-uniformity">1.28</strong>
+                            </div>
+                            <div class="metric-box">
+                                <span>Eficiencia Corte</span>
+                                <strong id="metric-efficiency">96.4%</strong>
+                            </div>
+                            <div class="metric-box">
+                                <span>Salud Gomas Base</span>
+                                <strong id="metric-goma" style="color: var(--success);">Óptima</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: INSPECCIÓN IA -->
+            <div id="tab-ai-inspector" class="tab-pane">
+                <div class="full-width-pane">
+                    <div class="panel-card">
+                        <h3>Módulo de Diagnóstico Inteligente por Fotografía</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Suba o simule una captura fotográfica de mallas, hilos de tejido o perfiles de goma de soporte para evaluar su estado técnico, porcentaje de desgaste y estimación de reposición.</p>
+                        
+                        <div class="ai-upload-zone" onclick="triggerAiSimulation()">
+                            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="margin: 0 auto 1rem; color: var(--secondary);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <p><strong>Haga clic aquí para simular análisis de imagen técnica</strong></p>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Soporta formatos JPG, PNG con alta resolución de tejidos metálicos</span>
+                        </div>
+
+                        <div class="ai-results" id="ai-results-container" style="display: none;">
+                            <div class="ai-card">
+                                <h4 style="color: var(--secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">Integridad de Abertura (0.9 mm)</h4>
+                                <p style="font-size: 0.8rem; color: var(--text-muted);">Desviación estimada del paño principal</p>
+                                <strong id="ai-res-opening" style="font-size: 1.2rem; color: var(--success);">98.2% Preciso</strong>
+                                <div class="progress-bar-container"><div class="progress-bar-fill" id="bar-opening" style="width: 98%;"></div></div>
+                            </div>
+                            <div class="ai-card">
+                                <h4 style="color: var(--secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">Fatiga de Hilos AISI 304</h4>
+                                <p style="font-size: 0.8rem; color: var(--text-muted);">Inspección por microfisuras dinámicas</p>
+                                <strong id="ai-res-fatigue" style="font-size: 1.2rem; color: var(--success);">Sin fatiga crítica</strong>
+                                <div class="progress-bar-container"><div class="progress-bar-fill" id="bar-fatigue" style="width: 15%; background: var(--success);"></div></div>
+                            </div>
+                            <div class="ai-card">
+                                <h4 style="color: var(--secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">Estado de Gomas de Base</h4>
+                                <p style="font-size: 0.8rem; color: var(--text-muted);">Desgaste por fricción oculta inferior</p>
+                                <strong id="ai-res-rubber" style="font-size: 1.2rem; color: var(--accent);">Desgaste Moderado (68%)</strong>
+                                <div class="progress-bar-container"><div class="progress-bar-fill" id="bar-rubber" style="width: 68%; background: var(--accent);"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: MANUAL DE REFERENCIA -->
+            <div id="tab-manual-ref" class="tab-pane">
+                <div class="full-width-pane">
+                    <div class="panel-card">
+                        <h3>Fundamentos del Manual Técnico Operativo (Versión Integral)</h3>
+                        <div style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; display: flex; flex-direction: column; gap: 1rem;">
+                            <p><strong>1. Precisión Cinética Avanzada:</strong> El coeficiente de lanzamiento ($K_v$) debe mantenerse estrictamente entre $3.5$ y $4.2$ para asegurar la proyección parabólica continua de la arena seca, permitiendo que el grano encuentre la luz de $0.9\text{ mm}$ sin rodaje estático perjudicial.</p>
+                            <p><strong>2. Dinámica de Lecho Delgado:</strong> En la zaranda secundaria de tres pisos, el caudal debe restringirse para que la capa no supere los $2.5$ a $3$ diámetros de grano, facilitando el hundimiento rápido de los finos en el primer tercio del paño.</p>
+                            <p><strong>3. Protocolo estricto de limpieza:</strong> Quedan prohibidas las herramientas de acero que deforman la luz de malla. Se exigen cepillos de nailon duro, polímeros o peines de bronce blando, operando estrictamente en sentido paralelo al hilo principal.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lógica de Autenticación
+        function handleLogin() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            if(user && pass) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-container').style.display = 'flex';
+                initCanvas();
+            } else {
+                alert('Por favor ingrese credenciales válidas.');
+            }
+        }
+
+        function handleLogout() {
+            document.getElementById('app-container').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'flex';
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+            if(tabId === 'simulator') {
+                resizeCanvas();
+            }
+        }
+
+        // Simulación Gráfica en Canvas (Zaranda y Celdas de Malla)
+        let canvas, ctx;
+        let currentTool = 'polimero'; // polimero, bronce, acero
+        let meshNodes = [];
+        let simulationParams = { rpm: 1350, amp: 2.5, slope: 3.0 };
+
+        function initCanvas() {
+            canvas = document.getElementById('simCanvas');
+            ctx = canvas.getContext('2d');
+            resizeCanvas();
+            generateMeshNodes();
+
+            canvas.addEventListener('click', handleCanvasInteraction);
+            window.addEventListener('resize', resizeCanvas);
+            requestAnimationFrame(renderLoop);
+        }
+
+        function resizeCanvas() {
+            if(!canvas) return;
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+
+        function generateMeshNodes() {
+            meshNodes = [];
+            const cols = 25;
+            const rows = 12;
+            const startX = 60;
+            const startY = 60;
+            const spacingX = (canvas.width - 120) / cols;
+            const spacingY = (canvas.height - 120) / rows;
+
+            for(let r=0; r<rows; r++) {
+                for(let c=0; c<cols; c++) {
+                    // Ciertas celdas con colmatación simulada (granos rojos)
+                    let clogged = (Math.sin(r * c) > 0.4);
+                    meshNodes.push({
+                        x: startX + c * spacingX,
+                        y: startY + r * spacingY,
+                        clogged: clogged,
+                        damaged: false,
+                        col: c,
+                        row: r
+                    });
+                }
+            }
+        }
+
+        function setTool(tool) {
+            currentTool = tool;
+            document.querySelectorAll('.toolbar .tool-btn').forEach(b => b.classList.remove('active'));
+            if(tool === 'polimero') document.getElementById('tool-poly').classList.add('active');
+            if(tool === 'bronce') document.getElementById('tool-bronze').classList.add('active');
+            if(tool === 'acero') document.getElementById('tool-steel').classList.add('active');
+        }
+
+        function updateCinematics() {
+            simulationParams.rpm = parseInt(document.getElementById('range-rpm').value);
+            simulationParams.amp = parseFloat(document.getElementById('range-amp').value);
+            simulationParams.slope = parseFloat(document.getElementById('range-slope').value);
+
+            document.getElementById('val-rpm').innerText = simulationParams.rpm;
+            document.getElementById('val-amp').innerText = simulationParams.amp;
+            document.getElementById('val-slope').innerText = simulationParams.slope;
+
+            // Cálculo Kv = A * (2*pi*f)^2 / g (g = 9810 mm/s2)
+            let f = simulationParams.rpm / 60;
+            let omega = 2 * Math.PI * f;
+            let kv = (simulationParams.amp * Math.pow(omega, 2)) / 9810;
+            document.getElementById('metric-kv').innerText = kv.toFixed(2);
+
+            if(kv < 3.5 || kv > 4.2) {
+                document.getElementById('metric-kv').style.color = 'var(--danger)';
+            } else {
+                document.getElementById('metric-kv').style.color = 'var(--success)';
+            }
+        }
+
+        function handleCanvasInteraction(e) {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            meshNodes.forEach(node => {
+                let dist = Math.hypot(node.x - mouseX, node.y - mouseY);
+                if(dist < 20) {
+                    if(currentTool === 'polimero' || currentTool === 'bronce') {
+                        if(node.clogged) node.clogged = false;
+                    } else if(currentTool === 'acero') {
+                        node.damaged = true; // El cepillo de acero daña el hilo
+                    }
+                }
+            });
+        }
+
+        let timeAcc = 0;
+        function renderLoop() {
+            if(!ctx) return;
+            timeAcc += 0.05;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Dibujar estructura de malla rectangular Tecmaq simulada con vibración armónica
+            let vOffset = Math.sin(timeAcc * (simulationParams.rpm / 100)) * simulationParams.amp;
+
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 2;
+
+            // Líneas de tejido de malla
+            meshNodes.forEach(node => {
+                let currentY = node.y + vOffset;
+                
+                // Dibujar intersección de hilos
+                ctx.beginPath();
+                ctx.arc(node.x, currentY, 3, 0, Math.PI * 2);
+                if(node.damaged) {
+                    ctx.fillStyle = 'var(--danger)'; // Hilo dañado por acero
+                } else if(node.clogged) {
+                    ctx.fillStyle = 'var(--accent)'; // Grano colmatado cuña
+                } else {
+                    ctx.fillStyle = 'var(--secondary)'; // Hilo sano AISI 304
+                }
+                ctx.fill();
+            });
+
+            requestAnimationFrame(renderLoop);
+        }
+
+        function triggerAiSimulation() {
+            const container = document.getElementById('ai-results-container');
+            container.style.display = 'grid';
+            
+            // Simular respuesta experta de IA
+            document.getElementById('ai-res-opening').innerText = '98.4% Preciso';
+            document.getElementById('bar-opening').style.width = '98.4%';
+            document.getElementById('ai-res-fatigue').innerText = 'Ausencia de microfisuras';
+            document.getElementById('ai-res-rubber').innerText = 'Desgaste Leve (42%)';
+            document.getElementById('bar-rubber').style.width = '42%';
+            document.getElementById('bar-rubber').style.background = 'var(--success)';
+        }
+    </script>
+</body>
+</html>
