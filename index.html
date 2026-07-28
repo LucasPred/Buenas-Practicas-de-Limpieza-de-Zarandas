@@ -218,11 +218,10 @@
 
         #canvas-container {
             width: 100%;
-            height: 450px;
+            height: 480px;
             background: #090d16;
             border-radius: 0.5rem;
             position: relative;
-            cursor: crosshair;
             overflow: hidden;
             border: 1px solid var(--border);
         }
@@ -242,19 +241,20 @@
             border-radius: 0.5rem;
             border: 1px solid var(--border);
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .tool-btn {
             background: var(--card-bg);
             color: var(--text);
             border: 1px solid var(--border);
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 0.75rem;
             border-radius: 0.375rem;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
             transition: all 0.2s;
         }
 
@@ -421,11 +421,12 @@
             <div id="tab-simulator" class="tab-pane active">
                 <div class="simulation-viewport">
                     <div class="viewport-header">
-                        <h3>Simulación en Tiempo Real - Deck de Zaranda Rectangular</h3>
+                        <h3>Simulación Deck Rectangular Tecmaq (Cursor con Cepillo Emulado)</h3>
                         <div class="toolbar">
                             <span style="font-size: 0.8rem; color: var(--text-muted);">Herramienta:</span>
                             <button class="tool-btn active" id="tool-poly" onclick="setTool('polimero')">Polímero Suave</button>
                             <button class="tool-btn" id="tool-bronze" onclick="setTool('bronce')">Peine Bronce</button>
+                            <button class="tool-btn" id="tool-plastic" onclick="setTool('plastico')">Plástico Duro</button>
                             <button class="tool-btn" id="tool-steel" onclick="setTool('acero')" style="border-color: var(--danger); color: var(--danger);">⚠️ Cepillo Acero</button>
                         </div>
                     </div>
@@ -434,7 +435,7 @@
                         <canvas id="simCanvas"></canvas>
                     </div>
                     <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">
-                        Instrucciones: Seleccione herramienta y haga clic/arrastre sobre los puntos de colmatación (granos rojos) en la malla. Observe cómo las herramientas indebidas (acero) deforman el hilo.
+                        Instrucciones: El cursor adopta la forma de la herramienta seleccionada. Limpie los puntos rojos de colmatación en la malla y bordes de bastidor. Evite el cepillo de acero para no dañar los hilos AISI 304.
                     </div>
                 </div>
 
@@ -524,7 +525,7 @@
                         <div style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; display: flex; flex-direction: column; gap: 1rem;">
                             <p><strong>1. Precisión Cinética Avanzada:</strong> El coeficiente de lanzamiento ($K_v$) debe mantenerse estrictamente entre $3.5$ y $4.2$ para asegurar la proyección parabólica continua de la arena seca, permitiendo que el grano encuentre la luz de $0.9\text{ mm}$ sin rodaje estático perjudicial.</p>
                             <p><strong>2. Dinámica de Lecho Delgado:</strong> En la zaranda secundaria de tres pisos, el caudal debe restringirse para que la capa no supere los $2.5$ a $3$ diámetros de grano, facilitando el hundimiento rápido de los finos en el primer tercio del paño.</p>
-                            <p><strong>3. Protocolo estricto de limpieza:</strong> Quedan prohibidas las herramientas de acero que deforman la luz de malla. Se exigen cepillos de nailon duro, polímeros o peines de bronce blando, operando estrictamente en sentido paralelo al hilo principal.</p>
+                            <p><strong>3. Protocolo estricto de limpieza en bordes y bastidor:</strong> La acumulación de polvillo en los apoyos de goma longitudinales y perfiles laterales genera fricción abrasiva oculta que corta prematuramente el acero. Quedan prohibidas las herramientas de acero; exigir polímeros, plásticos duros y peines de bronce.</p>
                         </div>
                     </div>
                 </div>
@@ -562,11 +563,13 @@
             }
         }
 
-        // Simulación Gráfica en Canvas (Zaranda y Celdas de Malla)
+        // Simulación Gráfica en Canvas con cursor emulado de cepillo/herramienta
         let canvas, ctx;
-        let currentTool = 'polimero'; // polimero, bronce, acero
+        let currentTool = 'polimero'; // polimero, bronce, plastico, acero
         let meshNodes = [];
         let simulationParams = { rpm: 1350, amp: 2.5, slope: 3.0 };
+        let mouseX = -100, mouseY = -100;
+        let isMouseDown = false;
 
         function initCanvas() {
             canvas = document.getElementById('simCanvas');
@@ -574,7 +577,24 @@
             resizeCanvas();
             generateMeshNodes();
 
-            canvas.addEventListener('click', handleCanvasInteraction);
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                mouseX = e.clientX - rect.left;
+                mouseY = e.clientY - rect.top;
+                if(isMouseDown) performToolAction();
+            });
+
+            canvas.addEventListener('mousedown', (e) => {
+                isMouseDown = true;
+                const rect = canvas.getBoundingClientRect();
+                mouseX = e.clientX - rect.left;
+                mouseY = e.clientY - rect.top;
+                performToolAction();
+            });
+
+            canvas.addEventListener('mouseup', () => { isMouseDown = false; });
+            canvas.addEventListener('mouseleave', () => { mouseX = -100; mouseY = -100; isMouseDown = false; });
+
             window.addEventListener('resize', resizeCanvas);
             requestAnimationFrame(renderLoop);
         }
@@ -584,26 +604,30 @@
             const container = canvas.parentElement;
             canvas.width = container.clientWidth;
             canvas.height = container.clientHeight;
+            generateMeshNodes();
         }
 
         function generateMeshNodes() {
             meshNodes = [];
-            const cols = 25;
-            const rows = 12;
-            const startX = 60;
-            const startY = 60;
-            const spacingX = (canvas.width - 120) / cols;
-            const spacingY = (canvas.height - 120) / rows;
+            const cols = 28;
+            const rows = 14;
+            const startX = 80;
+            const startY = 70;
+            const spacingX = (canvas.width - 160) / cols;
+            const spacingY = (canvas.height - 140) / rows;
 
             for(let r=0; r<rows; r++) {
                 for(let c=0; c<cols; c++) {
-                    // Ciertas celdas con colmatación simulada (granos rojos)
-                    let clogged = (Math.sin(r * c) > 0.4);
+                    let isEdge = (c <= 2 || c >= cols - 3);
+                    let cloggedChance = isEdge ? 0.85 : 0.25;
+                    let clogged = Math.random() < cloggedChance;
+                    
                     meshNodes.push({
                         x: startX + c * spacingX,
                         y: startY + r * spacingY,
                         clogged: clogged,
                         damaged: false,
+                        isEdge: isEdge,
                         col: c,
                         row: r
                     });
@@ -616,6 +640,7 @@
             document.querySelectorAll('.toolbar .tool-btn').forEach(b => b.classList.remove('active'));
             if(tool === 'polimero') document.getElementById('tool-poly').classList.add('active');
             if(tool === 'bronce') document.getElementById('tool-bronze').classList.add('active');
+            if(tool === 'plastico') document.getElementById('tool-plastic').classList.add('active');
             if(tool === 'acero') document.getElementById('tool-steel').classList.add('active');
         }
 
@@ -628,7 +653,6 @@
             document.getElementById('val-amp').innerText = simulationParams.amp;
             document.getElementById('val-slope').innerText = simulationParams.slope;
 
-            // Cálculo Kv = A * (2*pi*f)^2 / g (g = 9810 mm/s2)
             let f = simulationParams.rpm / 60;
             let omega = 2 * Math.PI * f;
             let kv = (simulationParams.amp * Math.pow(omega, 2)) / 9810;
@@ -641,18 +665,15 @@
             }
         }
 
-        function handleCanvasInteraction(e) {
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-
+        function performToolAction() {
             meshNodes.forEach(node => {
                 let dist = Math.hypot(node.x - mouseX, node.y - mouseY);
-                if(dist < 20) {
-                    if(currentTool === 'polimero' || currentTool === 'bronce') {
+                if(dist < 25) {
+                    if(currentTool === 'polimero' || currentTool === 'bronce' || currentTool === 'plastico') {
                         if(node.clogged) node.clogged = false;
                     } else if(currentTool === 'acero') {
-                        node.damaged = true; // El cepillo de acero daña el hilo
+                        node.damaged = true;
+                        node.clogged = false;
                     }
                 }
             });
@@ -664,28 +685,70 @@
             timeAcc += 0.05;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Dibujar estructura de malla rectangular Tecmaq simulada con vibración armónica
+            // Bastidores y Gomas
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(40, 50, 25, canvas.height - 100);
+            ctx.fillRect(canvas.width - 65, 50, 25, canvas.height - 100);
+
+            ctx.fillStyle = '#334155';
+            ctx.font = '10px sans-serif';
+            ctx.fillText('BASTIDOR / GOMAS', 42, 40);
+            ctx.fillText('BASTIDOR / GOMAS', canvas.width - 125, 40);
+
             let vOffset = Math.sin(timeAcc * (simulationParams.rpm / 100)) * simulationParams.amp;
 
-            ctx.strokeStyle = '#334155';
-            ctx.lineWidth = 2;
-
-            // Líneas de tejido de malla
+            // Dibujar mallas y colmataciones
             meshNodes.forEach(node => {
                 let currentY = node.y + vOffset;
                 
-                // Dibujar intersección de hilos
+                ctx.strokeStyle = node.damaged ? 'var(--danger)' : '#334155';
+                ctx.lineWidth = node.damaged ? 1.5 : 1;
+                ctx.strokeRect(node.x - 8, currentY - 8, 16, 16);
+
                 ctx.beginPath();
-                ctx.arc(node.x, currentY, 3, 0, Math.PI * 2);
+                ctx.arc(node.x, currentY, node.isEdge ? 5 : 4, 0, Math.PI * 2);
+                
                 if(node.damaged) {
-                    ctx.fillStyle = 'var(--danger)'; // Hilo dañado por acero
+                    ctx.fillStyle = 'var(--danger)';
                 } else if(node.clogged) {
-                    ctx.fillStyle = 'var(--accent)'; // Grano colmatado cuña
+                    ctx.fillStyle = '#ef4444'; // Puntos rojos de colmatación
                 } else {
-                    ctx.fillStyle = 'var(--secondary)'; // Hilo sano AISI 304
+                    ctx.fillStyle = 'var(--secondary)';
                 }
                 ctx.fill();
+
+                if(node.isEdge && node.clogged) {
+                    ctx.strokeStyle = '#f59e0b';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(node.x - 10, currentY - 10, 20, 20);
+                }
             });
+
+            // EMULACIÓN GRÁFICA DEL CURSOR COMO CEPILLO REAL SOBRE EL CANVAS
+            if(mouseX >= 0 && mouseY >= 0) {
+                ctx.save();
+                ctx.translate(mouseX, mouseY);
+                
+                // Dibujar mango del cepillo
+                ctx.fillStyle = '#b45309';
+                ctx.fillRect(-4, -20, 8, 18);
+
+                // Dibujar base y cerdas según la herramienta seleccionada
+                if(currentTool === 'polimero') {
+                    ctx.fillStyle = '#0ea5e9'; // Cerdas azules de polímero suave
+                    ctx.fillRect(-10, -2, 20, 6);
+                } else if(currentTool === 'bronce') {
+                    ctx.fillStyle = '#d97706'; // Cerdas doradas de bronce
+                    ctx.fillRect(-10, -2, 20, 6);
+                } else if(currentTool === 'plastico') {
+                    ctx.fillStyle = '#22c55e'; // Cerdas verdes de plástico duro
+                    ctx.fillRect(-10, -2, 20, 6);
+                } else if(currentTool === 'acero') {
+                    ctx.fillStyle = '#ef4444'; // Cerdas rojas de acero (peligro)
+                    ctx.fillRect(-10, -2, 20, 6);
+                }
+                ctx.restore();
+            }
 
             requestAnimationFrame(renderLoop);
         }
@@ -694,7 +757,6 @@
             const container = document.getElementById('ai-results-container');
             container.style.display = 'grid';
             
-            // Simular respuesta experta de IA
             document.getElementById('ai-res-opening').innerText = '98.4% Preciso';
             document.getElementById('bar-opening').style.width = '98.4%';
             document.getElementById('ai-res-fatigue').innerText = 'Ausencia de microfisuras';
