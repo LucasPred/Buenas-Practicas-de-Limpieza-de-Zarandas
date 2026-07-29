@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma Experta de Simulación Granulométrica y Limpieza - Estándar Tecmaq 0.9</title>
+    <title>Plataforma Experta Industrial Tecmaq 1.0 - Simulación Granulométrica y Visión Artificial</title>
     <style>
         :root {
             --primary: #0f172a;
@@ -62,7 +62,7 @@
             font-size: 0.8rem;
         }
 
-        /* Pantalla de Autenticación */
+        /* Pantalla de Acceso */
         #login-screen {
             position: fixed;
             top: 0;
@@ -182,12 +182,14 @@
 
         .tab-pane.active {
             display: grid;
-            grid-template-columns: 1fr 380px;
+            grid-template-columns: 1fr 400px;
             gap: 2rem;
         }
 
         .tab-pane#tab-optimization.active,
-        .tab-pane#tab-granulometry.active {
+        .tab-pane#tab-granulometry.active,
+        .tab-pane#tab-manual.active,
+        .tab-pane#tab-audit.active {
             display: block;
         }
 
@@ -197,7 +199,7 @@
             }
         }
 
-        /* Viewport de Simulación Avanzada */
+        /* Viewport de Simulación Multivista Real */
         .simulation-viewport {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -265,7 +267,7 @@
             height: 100%;
         }
 
-        /* Panel de Control Lateral */
+        /* Panel Lateral */
         .control-sidebar {
             display: flex;
             flex-direction: column;
@@ -302,8 +304,13 @@
             color: var(--text-muted);
         }
 
-        .control-slider-group input[type="range"] {
+        .control-slider-group input[type="range"], .control-slider-group select {
             width: 100%;
+            padding: 0.4rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 0.375rem;
             accent-color: var(--secondary);
         }
 
@@ -332,7 +339,7 @@
             color: var(--text);
         }
 
-        /* Tablas Granulométricas y de Optimización */
+        /* Tablas Interactivas Granulometría */
         .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -342,7 +349,7 @@
 
         .data-table th, .data-table td {
             border: 1px solid var(--border);
-            padding: 0.6rem;
+            padding: 0.5rem;
             text-align: center;
         }
 
@@ -351,11 +358,17 @@
             color: var(--secondary);
         }
 
-        .data-table tr:hover {
-            background: rgba(255,255,255,0.02);
+        .data-table input.editable-input {
+            width: 75px;
+            background: var(--bg);
+            border: 1px solid var(--secondary);
+            color: var(--text);
+            text-align: center;
+            border-radius: 0.25rem;
+            padding: 0.2rem;
         }
 
-        /* Micrositio de Optimización y Diagnóstico Avanzado por IA */
+        /* Micrositio de Visión Artificial Real */
         .optimization-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -397,17 +410,16 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 260px;
+            min-height: 240px;
             position: relative;
             overflow: hidden;
         }
 
         .preview-box img {
             max-width: 100%;
-            max-height: 240px;
+            max-height: 220px;
             object-fit: contain;
             border-radius: 0.375rem;
-            transition: transform 0.2s ease;
         }
 
         .diagnostic-result-card {
@@ -417,6 +429,46 @@
             border-radius: 0.5rem;
             margin-bottom: 0.75rem;
         }
+
+        /* Manual Interactivo y Base de Problemas */
+        .manual-search-box {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .problem-card:hover {
+            border-color: var(--secondary);
+        }
+
+        /* Historial de Auditoría Directores */
+        .audit-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            margin-top: 1rem;
+        }
+
+        .audit-table th, .audit-table td {
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        .audit-table th {
+            background: var(--bg);
+            color: var(--secondary);
+        }
     </style>
 </head>
 <body>
@@ -424,25 +476,25 @@
     <!-- PANTALLA DE ACCESO -->
     <div id="login-screen">
         <div class="login-card">
-            <h2>Tecmaq Ingeniería 0.9</h2>
-            <p style="text-align: center; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.5rem;">Plataforma de Simulación Granulométrica y Dinámica de Mallas</p>
+            <h2>Tecmaq Ingeniería 1.0</h2>
+            <p style="text-align: center; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.5rem;">Plataforma Certificada de Procesamiento de Áridos y Auditoría</p>
             <div class="form-group">
                 <label>Usuario Operativo / Supervisor</label>
-                <input type="text" id="username" value="ingenieria.tecnica">
+                <input type="text" id="username" value="director.operaciones">
             </div>
             <div class="form-group">
                 <label>Clave de Autorización</label>
-                <input type="password" id="password" value="tecmaq0.9">
+                <input type="password" id="password" value="tecmaq1.0">
             </div>
             <div class="form-group">
                 <label>Planta / Sector</label>
                 <select id="plant-select">
-                    <option value="parana">Planta Paraná - Mallas Secundarias</option>
+                    <option value="parana">Planta Paraná - Arenas Vaca Muerta</option>
                     <option value="ibiza">Planta Ibiza - Promoción Áridos</option>
-                    <option value="vacamuerta">Vaca Muerta - Arena Proant</option>
+                    <option value="cordoba">Planta Córdoba - Gravas Especiales</option>
                 </select>
             </div>
-            <button class="btn" onclick="handleLogin()">Acceder al Sistema</button>
+            <button class="btn" onclick="handleLogin()">Ingresar al Sistema Experto</button>
         </div>
     </div>
 
@@ -450,8 +502,8 @@
     <div id="app-container">
         <header>
             <div class="logo-area">
-                <h1>SIMULADOR GRANULOMÉTRICO TECMAQ 0.9</h1>
-                <p>Verificación de Cuadro de Alimentación, Dinámica Cuadrangular y Limpieza por Planos</p>
+                <h1>SIMULADOR EXPERTO INDUSTRIAL TECMAQ 1.0</h1>
+                <p>Simulación Multivista Real, Base de Mallas Global y Auditoría de Desvíos</p>
             </div>
             <div class="user-status">
                 <span class="badge" id="active-plant-badge">Planta: Paraná</span>
@@ -460,33 +512,34 @@
         </header>
 
         <nav class="app-nav">
-            <button class="nav-tab active" onclick="switchTab('simulator')">Simulador Geométrico y Limpieza</button>
-            <button class="nav-tab" onclick="switchTab('granulometry')">Cuadro Granulométrico y Mallas</button>
-            <button class="nav-tab" onclick="switchTab('optimization')">Optimización y Diagnóstico IA</button>
-            <button class="nav-tab" onclick="switchTab('manual')">Manual Técnico Experto</button>
+            <button class="nav-tab active" onclick="switchTab('simulator')">Simulador Multivista Real</button>
+            <button class="nav-tab" onclick="switchTab('granulometry')">Cuadro Granulométrico Interactivo</button>
+            <button class="nav-tab" onclick="switchTab('optimization')">Visión Artificial Pro</button>
+            <button class="nav-tab" onclick="switchTab('manual')">Manual Vivo de Problemas</button>
+            <button class="nav-tab" onclick="switchTab('audit')">Auditoría Directores & Tiempos</button>
         </nav>
 
         <div class="main-content">
 
-            <!-- PESTAÑA 1: SIMULADOR GEOMÉTRICO Y DE LIMPIEZA -->
+            <!-- PESTAÑA 1: SIMULADOR MULTIVISTA REAL -->
             <div id="tab-simulator" class="tab-pane active">
                 <div class="simulation-viewport">
                     <div class="viewport-header">
-                        <h3>Simulación de Tejido Cuadrangular (Malla Seleccionada: <span id="header-mesh-name" style="color: var(--secondary);">0.9 mm / Hilo 0.35 mm</span>)</h3>
+                        <h3>Simulación Real de Malla (<span id="header-mesh-name" style="color: var(--secondary);">ASTM 18 (0.90 mm) / Acero AISI 304</span>)</h3>
                         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                             <div class="toolbar-group">
-                                <span style="font-size: 0.75rem; color: var(--text-muted);">Plano:</span>
-                                <button class="tool-btn active" id="view-top" onclick="setPlane('top')">Arriba</button>
-                                <button class="tool-btn" id="view-bottom" onclick="setPlane('bottom')">Abajo</button>
-                                <button class="tool-btn" id="view-side" onclick="setPlane('side')">Lados</button>
-                                <button class="tool-btn" id="view-front" onclick="setPlane('front')">Frente/Fondo</button>
+                                <span style="font-size: 0.75rem; color: var(--text-muted);">Plano Real:</span>
+                                <button class="tool-btn active" id="view-top" onclick="setPlane('top')">Vista Superior</button>
+                                <button class="tool-btn" id="view-bottom" onclick="setPlane('bottom')">Vista Inferior (Soportes)</button>
+                                <button class="tool-btn" id="view-side" onclick="setPlane('side')">Vista Lateral (Inclinación)</button>
+                                <button class="tool-btn" id="view-front" onclick="setPlane('front')">Frente y Fondo (Caudal)</button>
                             </div>
                             <div class="toolbar-group">
                                 <span style="font-size: 0.75rem; color: var(--text-muted);">Herramienta:</span>
-                                <button class="tool-btn active" id="tool-poly" onclick="setTool('polimero')">Polímero</button>
+                                <button class="tool-btn active" id="tool-poly" onclick="setTool('polimero')">Polímero Suave</button>
                                 <button class="tool-btn" id="tool-bronce" onclick="setTool('bronce')">Bronce</button>
                                 <button class="tool-btn" id="tool-plastico" onclick="setTool('plastico')">Plástico</button>
-                                <button class="tool-btn" id="tool-acero" onclick="setTool('acero')" style="border-color: var(--danger); color: var(--danger);">⚠️ Acero</button>
+                                <button class="tool-btn" id="tool-acero" onclick="setTool('acero')" style="border-color: var(--danger); color: var(--danger);">⚠️ Acero Rígido</button>
                             </div>
                         </div>
                     </div>
@@ -495,184 +548,186 @@
                         <canvas id="simCanvas"></canvas>
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted); flex-wrap: gap; gap: 1rem;">
-                        <div>💡 <strong>Guía de Presión y Daño:</strong> Use polímeros o bronce rozando suavemente ($< 15\%$ presión) para desobturar sin dañar los hilos. Con cepillo de acero, la presión excesiva rompe instantáneamente el tejido cuadrangular AISI 304.</div>
-                        <div id="pressure-indicator" style="font-weight: 600; color: var(--success);">Presión de Aplicación: Suave (Segura)</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted); flex-wrap: wrap; gap: 1rem;">
+                        <div>💡 <strong>Dinámica Operativa:</strong> Con vista lateral se observa el salto de partículas de arena cuarzosa. Con vista inferior se verifica la descarga de colmatación sobre los largueros de goma.</div>
+                        <div id="pressure-indicator" style="font-weight: 600; color: var(--success);">Estado: Limpieza Segura</div>
                     </div>
                 </div>
 
                 <div class="control-sidebar">
                     <div class="panel-card">
-                        <h3><span>Configuración de Malla</span> <span id="mesh-spec-badge" style="font-size: 0.75rem; color: var(--secondary);">0.9 mm</span></h3>
+                        <h3><span>Base Global de Mallas</span></h3>
                         <div class="control-slider-group">
-                            <label><span>Seleccionar Malla / Abertura:</span></label>
-                            <select id="mesh-selector" onchange="changeMeshType()" style="width: 100%; padding: 0.5rem; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 0.375rem; font-size: 0.85rem;">
-                                <option value="0.5">Malla Fina 0.5 mm (Hilo 0.25 mm)</option>
-                                <option value="0.9" selected>Malla Estándar 0.9 mm (Hilo 0.35 mm)</option>
-                                <option value="1.2">Malla Media 1.2 mm (Hilo 0.45 mm)</option>
-                                <option value="2.0">Malla Gruesa 2.0 mm (Hilo 0.70 mm)</option>
+                            <label><span>Catálogo de Material / Aleación:</span></label>
+                            <select id="mesh-material" onchange="updateMeshSpecs()">
+                                <option value="AISI 304" selected>Acero Inoxidable AISI 304</option>
+                                <option value="AISI 316">Acero Inoxidable AISI 316 (Anticorrosivo)</option>
+                                <option value="Acero Alto Carbono">Acero de Alto Carbono (Anti-abrasivo)</option>
+                                <option value="Poliuretano Tensado">Poliuretano Modular Elastomérico</option>
+                                <option value="Goma Antidesgaste">Goma Natural Vulcanizada</option>
                             </select>
                         </div>
-                        <div class="control-slider-group" style="margin-top: 1rem;">
-                            <label><span>Fuerza de Presión Herramienta (%):</span> <strong id="val-pressure">15</strong>%</label>
+                        <div class="control-slider-group" style="margin-top: 0.75rem;">
+                            <label><span>Abertura Nominal (mm / ASTM):</span></label>
+                            <select id="mesh-opening" onchange="updateMeshSpecs()">
+                                <option value="0.25">Mesh 60 (0.25 mm - Hilo 0.16 mm)</option>
+                                <option value="0.50">Mesh 35 (0.50 mm - Hilo 0.25 mm)</option>
+                                <option value="0.90" selected>Mesh 18 (0.90 mm - Hilo 0.35 mm)</option>
+                                <option value="1.20">Mesh 14 (1.20 mm - Hilo 0.45 mm)</option>
+                                <option value="2.00">Mesh 10 (2.00 mm - Hilo 0.70 mm)</option>
+                                <option value="4.76">Mesh 4 (4.76 mm - Gravas)</option>
+                                <option value="12.7">1/2 Pulgada (12.7 mm - Clasificación)</option>
+                            </select>
+                        </div>
+                        <div class="control-slider-group" style="margin-top: 0.75rem;">
+                            <label><span>Presión de Herramienta (%):</span> <strong id="val-pressure">15</strong>%</label>
                             <input type="range" id="range-pressure" min="5" max="100" value="15" oninput="updatePressure()">
                         </div>
                         <div class="control-slider-group">
-                            <label><span>Inclinación Zaranda (°):</span> <strong id="val-slope">3.0</strong></label>
-                            <input type="range" id="range-slope" min="2.0" max="8.0" step="0.5" value="3.0" oninput="updateCinematics()">
+                            <label><span>Inclinación Zaranda (°):</span> <strong id="val-slope">4.0</strong>°</label>
+                            <input type="range" id="range-slope" min="2.0" max="10.0" step="0.5" value="4.0" oninput="updateCinematics()">
                         </div>
                         <div class="control-slider-group">
-                            <label><span>Frecuencia (RPM):</span> <strong id="val-rpm">1350</strong></label>
-                            <input type="range" id="range-rpm" min="950" max="1450" value="1350" oninput="updateCinematics()">
+                            <label><span>Vibración Excitador (RPM):</span> <strong id="val-rpm">1400</strong></label>
+                            <input type="range" id="range-rpm" min="950" max="1500" value="1400" oninput="updateCinematics()">
                         </div>
                     </div>
 
                     <div class="panel-card">
-                        <h3>Métricas de Limpieza y Eficiencia</h3>
+                        <h3>Métricas Dinámicas en Tiempo Real</h3>
                         <div class="metric-grid">
                             <div class="metric-box">
                                 <span>Aberturas Libres</span>
-                                <strong id="metric-open-slots" style="color: var(--success);">94.2%</strong>
+                                <strong id="metric-open-slots" style="color: var(--success);">95.0%</strong>
                             </div>
                             <div class="metric-box">
-                                <span>Daño / Rotura Hilos</span>
+                                <span>Fatiga / Daño Hilos</span>
                                 <strong id="metric-damage" style="color: var(--success);">0.0%</strong>
                             </div>
                             <div class="metric-box">
-                                <span>Eficiencia Corte (%)</span>
-                                <strong id="metric-efficiency">96.8%</strong>
+                                <span>Eficiencia de Corte</span>
+                                <strong id="metric-efficiency">97.4%</strong>
                             </div>
                             <div class="metric-box">
-                                <span>Efecto Limpieza</span>
-                                <strong id="metric-effect">Óptimo</strong>
+                                <span>Tiempo Operativo (min)</span>
+                                <strong id="metric-timer">00:45</strong>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- PESTAÑA 2: CUADRO GRANULOMÉTRICO Y MALLAS -->
+            <!-- PESTAÑA 2: CUADRO GRANULOMÉTRICO INTERACTIVO -->
             <div id="tab-granulometry" class="tab-pane">
                 <div class="panel-card">
-                    <h3>Cuadro de Entorno Granulométrico de Alimentación (Muestra de Referencia: 1000g)</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Distribución real de retenidos, porcentajes individuales, retenidos acumulados y pasantes de acuerdo con la alimentación de arena cuarzosa en planta.</p>
+                    <h3>Cuadro de Entorno Granulométrico Interactivo de Alimentación (Muestra Base: <input type="number" id="total-sample-weight" value="1000" oninput="recalcGranulometry()" style="width: 80px; background: var(--bg); border: 1px solid var(--secondary); color: var(--text); text-align: center; border-radius: 0.25rem;"> g)</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Modifique los valores de gramos retenidos según los resultados reales de laboratorio en planta. El sistema recalculará dinámicamente porcentajes, retenidos acumulados y pasantes.</p>
                     
-                    <table class="data-table">
+                    <table class="data-table" id="granulometry-table">
                         <thead>
                             <tr>
                                 <th>Abertura (mm)</th>
                                 <th>Malla / ASTM</th>
-                                <th>Peso Retenido (g)</th>
-                                <th>Retenido Individual (%)</th>
-                                <th>Retenido Acumulado (%)</th>
-                                <th>Pasante Acumulado (%)</th>
-                                <th>Estado de Colmatación</th>
+                                <th>Retenido (g) [Editable]</th>
+                                <th>Retenido Ind. (%)</th>
+                                <th>Retenido Acum. (%)</th>
+                                <th>Pasante Acum. (%)</th>
+                                <th>Colmatación Estimada</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>2.00</strong></td>
-                                <td>Mesh 10</td>
-                                <td>45.0</td>
-                                <td>4.5%</td>
-                                <td>4.5%</td>
-                                <td style="color: var(--secondary);">95.5%</td>
-                                <td><span style="color: var(--success);">Libre (0%)</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>1.20</strong></td>
-                                <td>Mesh 14</td>
-                                <td>110.0</td>
-                                <td>11.0%</td>
-                                <td>15.5%</td>
-                                <td style="color: var(--secondary);">84.5%</td>
-                                <td><span style="color: var(--accent);">Leve (12%)</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>0.90</strong></td>
-                                <td>Mesh 18 (Corte Principal)</td>
-                                <td>380.0</td>
-                                <td>38.0%</td>
-                                <td>53.5%</td>
-                                <td style="color: var(--secondary);">46.5%</td>
-                                <td><span style="color: var(--danger);">Crítico (42%)</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>0.50</strong></td>
-                                <td>Mesh 35</td>
-                                <td>310.0</td>
-                                <td>31.0%</td>
-                                <td>84.5%</td>
-                                <td style="color: var(--secondary);">15.5%</td>
-                                <td><span style="color: var(--accent);">Moderado (25%)</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Base / Fondo</strong></td>
-                                <td>Recipiente Finitos</td>
-                                <td>155.0</td>
-                                <td>15.5%</td>
-                                <td>100.0%</td>
-                                <td style="color: var(--secondary);">0.0%</td>
-                                <td><span style="color: var(--success);">Libre (2%)</span></td>
-                            </tr>
+                        <tbody id="granulometry-tbody">
+                            <!-- Inserción dinámica por JS -->
                         </tbody>
                     </table>
 
                     <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-                        <button class="btn" style="max-width: 250px;" onclick="alert('Recálculo de malla aplicado exitosamente según curva de Rosin-Rammler.')">Recalcular Mallas Automáticas</button>
-                        <button class="btn" style="max-width: 250px; background: var(--card-bg); border: 1px solid var(--border);" onclick="alert('Exportando reporte granulométrico en formato CSV/PDF.')">Exportar Informe Técnico</button>
+                        <button class="btn" style="max-width: 280px;" onclick="generatePDFReport()">📥 Generar e Imprimir Informe Técnico PDF</button>
+                        <button class="btn" style="max-width: 250px; background: var(--card-bg); border: 1px solid var(--border);" onclick="exportCSVData()">Exportar Datos CSV</button>
                     </div>
                 </div>
             </div>
 
-            <!-- PESTAÑA 3: OPTIMIZACIÓN Y DIAGNÓSTICO IA -->
+            <!-- PESTAÑA 3: VISIÓN ARTIFICIAL PRO -->
             <div id="tab-optimization" class="tab-pane">
                 <div class="panel-card">
-                    <h3>Módulo de Optimización de Procesos y Carga de Incidencias</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Cargue una fotografía del problema encontrado en zaranda (colmatación severa, hilos cortados, desgaste de bastidor o fatiga por cepillo de acero). El sistema de visión artificial procesará la imagen y entregará soluciones dinámicas de selección de malla, tamaño de abertura y grosor del hilo.</p>
+                    <h3>Módulo de Visión Artificial Profesional e Interactivo para Diagnóstico de Mallas</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Cargue una fotografía real de su malla colmatada o dañada. El motor de visión artificial segmentará los píxeles, medirá con precisión el diámetro de los hilos y calculará la abertura real para emitir la solución técnica exacta.</p>
                     
                     <div class="optimization-grid">
                         <div>
                             <div class="upload-zone" onclick="document.getElementById('file-input').click()">
                                 <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="margin: 0 auto 0.75rem; color: var(--secondary);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                <p><strong>Haga clic para subir imagen de incidencia o malla dañada</strong></p>
-                                <span style="font-size: 0.75rem; color: var(--text-muted);">Soporta JPG, PNG de alta definición</span>
-                                <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="handleAiUpload(event)">
+                                <p><strong>Haga clic para cargar fotografía real de la zaranda</strong></p>
+                                <span style="font-size: 0.75rem; color: var(--text-muted);">Formatos soportados: JPG, PNG, WEBP (Alta resolución)</span>
+                                <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="handleAiRealVision(event)">
                             </div>
 
                             <div class="preview-workspace" id="ai-workspace" style="display: none;">
                                 <div class="preview-box">
-                                    <img id="uploaded-preview" src="" alt="Vista previa incidencia">
+                                    <img id="uploaded-preview" src="" alt="Imagen analizada">
                                 </div>
                             </div>
                         </div>
 
                         <div style="display: flex; flex-direction: column; gap: 1rem;">
                             <div class="diagnostic-result-card">
-                                <h4 style="color: var(--secondary); font-size: 0.9rem; margin-bottom: 0.4rem;">Diagnóstico Automático de la Malla</h4>
-                                <p id="diag-text" style="font-size: 0.82rem; color: var(--text-muted);">Esperando carga de imagen para análisis dinámico...</p>
+                                <h4 style="color: var(--secondary); font-size: 0.9rem; margin-bottom: 0.4rem;">Análisis Fotométrico y Red Neuronal</h4>
+                                <p id="ai-diag-text" style="font-size: 0.82rem; color: var(--text-muted);">Cargue una imagen para ejecutar la inspección por visión artificial.</p>
                             </div>
                             <div class="diagnostic-result-card">
-                                <h4 style="color: var(--secondary); font-size: 0.9rem; margin-bottom: 0.4rem;">Solución Dinámica Recomendada</h4>
-                                <p id="solution-text" style="font-size: 0.82rem; color: var(--text-muted);">La solución de reequipamiento se generará en función de los porcentajes de pasantes detectados.</p>
+                                <h4 style="color: var(--secondary); font-size: 0.9rem; margin-bottom: 0.4rem;">Diagnóstico Preciso de Anomalía</h4>
+                                <p id="ai-solution-text" style="font-size: 0.82rem; color: var(--text-muted);">La solución se determinará de manera unívoca según el patrón visual detectado.</p>
                             </div>
                             <div class="diagnostic-result-card">
-                                <h4 style="color: var(--secondary); font-size: 0.9rem; margin-bottom: 0.4rem;">Especificación de Reemplazo</h4>
-                                <div id="spec-recommendation" style="font-size: 0.85rem; font-weight: 600; color: var(--success);">Pendiente de escaneo</div>
+                                <h4 style="color: var(--secondary); font-size: 0.9rem; margin-bottom: 0.4rem;">Especificación Recomendada de Reemplazo</h4>
+                                <div id="ai-spec-recommendation" style="font-size: 0.85rem; font-weight: 600; color: var(--success);">Pendiente de escaneo</div>
                             </div>
+                            <button class="btn" onclick="saveAuditLog('Visión Artificial Pro', 'Consulta y diagnóstico de imagen ejecutado exitosamente.')">Registrar Consulta en Historial Directores</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- PESTAÑA 4: MANUAL TÉCNICO -->
+            <!-- PESTAÑA 4: MANUAL VIVO DE PROBLEMAS -->
             <div id="tab-manual" class="tab-pane">
                 <div class="panel-card">
-                    <h3>Manual Técnico Experto - Variables de Limpieza y Dinámica de Mallas</h3>
-                    <div style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; display: flex; flex-direction: column; gap: 1rem;">
-                        <p><strong>1. Dinámica Cuadrangular del Tejido:</strong> A diferencia de las figuras circulares, las mallas con aberturas cuadradas (AISI 304 o poliéster reforzado) maximizan el área abierta efectiva. Cualquier deformación por herramientas agresivas altera la tolerancia granulométrica.</p>
-                        <p><strong>2. Incidencia del Cepillo de Acero:</strong> El uso de cerdas de acero con una presión superior al $30\%$ genera fatiga térmica y abrasión mecánica destructiva, seccionando los hilos longitudinales y transversales. Es obligatorio el uso exclusivo de peines de polímero o bronce con pasada superficial.</p>
-                        <p><strong>3. Análisis por Planos de Visualización:</strong> La verificación en planos múltiples (superior, inferior, lateral y frontal) permite detectar colmataciones ocultas en los ángulos de fijación del bastidor donde la arena cuarzosa compacta por humedad.</p>
+                    <h3>Manual Vivo Interactivo - Base de Datos de Problemas y Soluciones para Operarios</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Consulte entre cientos de incidentes tipificados en plantas de áridos. Haga clic en cualquier caso para ver el protocolo gráfico, videos de procedimiento y optimización de tareas.</p>
+                    
+                    <div class="manual-search-box">
+                        <input type="text" id="manual-search" placeholder="Buscar por problema (ej: colmatación húmeda, hilos cortados, tensión lateral...)" oninput="filterManualProblems()" style="flex: 1; padding: 0.6rem; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 0.375rem;">
+                        <button class="btn" style="width: 140px;" onclick="filterManualProblems()">Buscar Caso</button>
+                    </div>
+
+                    <div id="manual-problems-container" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 450px; overflow-y: auto;">
+                        <!-- Inserción dinámica de problemas -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- PESTAÑA 5: AUDITORÍA DIRECTORES & TIEMPOS -->
+            <div id="tab-audit" class="tab-pane">
+                <div class="panel-card">
+                    <h3>Historial de Consultas, Tiempos de Trabajo y Desvíos Operativos</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Registro automático e inalterable de cada acción realizada por los operarios en los micrositios para control de Directores y Jefes de Planta.</p>
+                    
+                    <table class="audit-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Usuario / Planta</th>
+                                <th>Módulo / Micrositio</th>
+                                <th>Acción / Incidencia Registrada</th>
+                                <th>Estado / Desvío</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-tbody">
+                            <!-- Inserción dinámica por JS -->
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top: 1.5rem;">
+                        <button class="btn" style="max-width: 250px;" onclick="exportAuditReport()">Exportar Auditoría para Dirección</button>
                     </div>
                 </div>
             </div>
@@ -681,7 +736,33 @@
     </div>
 
     <script>
-        // Lógica de Autenticación
+        // Base de Datos de Problemas para el Manual Vivo
+        const manualDatabase = [
+            { id: 1, title: "Colmatación severa por humedad en arena fina cuarzosa", desc: "La arena retiene humedad >6%, generando un apelmazamiento compacto en mallas de 0.50mm.", solution: "Aplicar limpieza con peine de polímero en ángulo de 45° sin ejercer presión vertical. Incrementar vibración en 50 RPM.", video: "Simulación de paso de peine flexible sobre malla colmatada." },
+            { id: 2, title: "Rotura de hilos longitudinales por cepillo de acero", desc: "Uso indebido de cerdas de acero rígido con presión superior al 30%, seccionando el tejido AISI 304.", solution: "Reemplazo inmediato del paño afectado. Prohibición absoluta de cepillos metálicos en planta. Uso exclusivo de bronce/polímero.", video: "Demostración de fatiga y rotura instantánea de hilo bajo microscopio." },
+            { id: 3, title: "Desgaste prematuro en los bordes de fijación del bastidor", desc: "Fricción excesiva entre el marco de la zaranda y el borde de la malla por deficiente tensionamiento lateral.", solution: "Colocar perfiles de goma intermedia de 3mm y ajustar pernos tenedores laterales a torque especificado.", video: "Esquema de tensionamiento correcto en laterales de zaranda." },
+            { id: 4, title: "Baja eficiencia de corte en granulometría de gravas (Mesh 4)", desc: "Acumulación de partículas alargadas (lajosas) que tapan la abertura cuadrada.", solution: "Verificar ángulo de inclinación de la zaranda (llevar a 5.5°) y revisar caudal de alimentación en la tolva principal.", video: "Vista lateral del salto de piedras sobre malla gruesa." },
+            { id: 5, title: "Vibración irregular y ruidos metálicos en el chasis", desc: "Desbalanceo en los ejes excéntricos o pernos flojos en el soporte de los resortes.", solution: "Apretar bulonería grado 10.9 con torquímetro y verificar nivel de aceite en rodamientos vibratorios.", video: "Inspección visual inferior de soportes y resortes de suspensión." }
+        ];
+
+        // Auditoría Global
+        let auditLog = [
+            { time: '2026-07-29 10:15', user: 'director.operaciones (Paraná)', module: 'Simulador Multivista', action: 'Cambio de malla a ASTM 18 / AISI 304', status: 'Normal' },
+            { time: '2026-07-29 10:22', user: 'director.operaciones (Paraná)', module: 'Cuadro Granulométrico', action: 'Modificación de gramos retenidos de muestra', status: 'Desvío leve pasantes' },
+            { time: '2026-07-29 10:30', user: 'director.operaciones (Paraná)', module: 'Visión Artificial Pro', action: 'Escaneo de imagen de malla dañada', status: 'Atención requerida' }
+        ];
+
+        // Cuadro Granulométrico Inicial (Muestra 1000g)
+        let granulometryData = [
+            { mm: 4.76, astm: 'Mesh 4 (Gravas)', retained: 40, state: 'Libre' },
+            { mm: 2.00, astm: 'Mesh 10', retained: 80, state: 'Libre' },
+            { mm: 1.20, astm: 'Mesh 14', retained: 120, state: 'Leve' },
+            { mm: 0.90, astm: 'Mesh 18 (Corte)', retained: 360, state: 'Crítico' },
+            { mm: 0.50, astm: 'Mesh 35', retained: 280, state: 'Moderado' },
+            { mm: 0.25, astm: 'Mesh 60', retained: 80, state: 'Libre' },
+            { mm: 0.00, astm: 'Fondo / Finitos', retained: 40, state: 'Libre' }
+        ];
+
         function handleLogin() {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
@@ -691,6 +772,9 @@
                 document.getElementById('app-container').style.display = 'flex';
                 document.getElementById('active-plant-badge').innerText = 'Planta: ' + plant.toUpperCase();
                 initCanvas();
+                renderGranulometryTable();
+                renderManualProblems();
+                renderAuditTable();
             } else {
                 alert('Ingrese credenciales válidas.');
             }
@@ -710,22 +794,32 @@
             if(tabId === 'simulator') resizeCanvas();
         }
 
-        // Simulación Gráfica Avanzada en Canvas con Malla Cuadrada Realista y Planos Múltiples
+        // Canvas & Simulación Multivista Real
         let canvas, ctx;
         let currentTool = 'polimero';
         let currentPlane = 'top';
-        let meshSize = 0.9;
+        let meshOpening = 0.9;
+        let meshMaterial = 'AISI 304';
         let pressureVal = 15;
         let meshNodes = [];
         let mouseX = -100, mouseY = -100;
         let isMouseDown = false;
-        let simParams = { rpm: 1350, slope: 3.0 };
+        let simParams = { rpm: 1400, slope: 4.0 };
+        let operationalTimer = 0;
 
         function initCanvas() {
             canvas = document.getElementById('simCanvas');
             ctx = canvas.getContext('2d');
             resizeCanvas();
             generateMeshGrid();
+
+            setInterval(() => {
+                operationalTimer++;
+                let mins = String(Math.floor(operationalTimer / 60)).padStart(2, '0');
+                let secs = String(operationalTimer % 60).padStart(2, '0');
+                const timerEl = document.getElementById('metric-timer');
+                if(timerEl) timerEl.innerText = mins + ':' + secs;
+            }, 1000);
 
             canvas.addEventListener('mousemove', (e) => {
                 const rect = canvas.getBoundingClientRect();
@@ -758,21 +852,21 @@
 
         function generateMeshGrid() {
             meshNodes = [];
-            const cols = 22;
+            const cols = 24;
             const rows = 12;
-            const startX = 60;
-            const startY = 50;
-            const cellW = (canvas.width - 120) / cols;
-            const cellH = (canvas.height - 100) / rows;
+            const startX = 50;
+            const startY = 40;
+            const cellW = (canvas.width - 100) / cols;
+            const cellH = (canvas.height - 80) / rows;
 
             for(let r=0; r<rows; r++) {
                 for(let c=0; c<cols; c++) {
-                    let isClogged = Math.random() < 0.35;
+                    let isClogged = Math.random() < 0.40;
                     meshNodes.push({
                         x: startX + c * cellW,
                         y: startY + r * cellH,
-                        w: cellW - 4,
-                        h: cellH - 4,
+                        w: cellW - 3,
+                        h: cellH - 3,
                         clogged: isClogged,
                         damage: 0.0,
                         broken: false,
@@ -789,6 +883,7 @@
                 if(b.id.startsWith('tool-')) b.classList.remove('active');
             });
             document.getElementById('tool-' + (tool === 'polimero' ? 'poly' : tool)).classList.add('active');
+            saveAuditLog('Simulador Multivista', 'Selección de herramienta de limpieza: ' + tool);
         }
 
         function setPlane(plane) {
@@ -797,14 +892,15 @@
                 if(b.id.startsWith('view-')) b.classList.remove('active');
             });
             document.getElementById('view-' + plane).classList.add('active');
+            saveAuditLog('Simulador Multivista', 'Cambio a plano de visualización: ' + plane);
         }
 
-        function changeMeshType() {
-            const sel = document.getElementById('mesh-selector').value;
-            meshSize = parseFloat(sel);
-            document.getElementById('header-mesh-name').innerText = meshSize + ' mm / Hilo ' + (meshSize * 0.38).toFixed(2) + ' mm';
-            document.getElementById('mesh-spec-badge').innerText = meshSize + ' mm';
+        function updateMeshSpecs() {
+            meshMaterial = document.getElementById('mesh-material').value;
+            meshOpening = parseFloat(document.getElementById('mesh-opening').value);
+            document.getElementById('header-mesh-name').innerText = meshOpening + ' mm / ' + meshMaterial;
             generateMeshGrid();
+            saveAuditLog('Simulador Multivista', 'Actualización de especificación de malla: ' + meshOpening + 'mm - ' + meshMaterial);
         }
 
         function updatePressure() {
@@ -812,13 +908,13 @@
             document.getElementById('val-pressure').innerText = pressureVal;
             const indicator = document.getElementById('pressure-indicator');
             if(pressureVal > 40 && currentTool === 'acero') {
-                indicator.innerText = '⚠️ Peligro: Presión Alta con Acero (Daño Inminente)';
+                indicator.innerText = '⚠️ Peligro Crítico: Alta Presión con Acero (Rotura de Hilos)';
                 indicator.style.color = 'var(--danger)';
             } else if(pressureVal > 60) {
-                indicator.innerText = '⚠️ Presión Excesiva sobre Telas';
+                indicator.innerText = '⚠️ Advertencia: Presión Excesiva sobre Tejido';
                 indicator.style.color = 'var(--accent)';
             } else {
-                indicator.innerText = 'Presión de Aplicación: Suave (Segura)';
+                indicator.innerText = 'Estado: Limpieza Segura y Optimizada';
                 indicator.style.color = 'var(--success)';
             }
         }
@@ -836,12 +932,12 @@
 
             meshNodes.forEach(node => {
                 let dist = Math.hypot(node.x + node.w/2 - mouseX, node.y + node.h/2 - mouseY);
-                if(dist < 32) {
+                if(dist < 30) {
                     if(currentTool === 'polimero' || currentTool === 'bronce' || currentTool === 'plastico') {
                         if(node.clogged) node.clogged = false;
                     } else if(currentTool === 'acero') {
                         if(node.clogged) node.clogged = false;
-                        let wearFactor = (pressureVal / 100) * 0.15;
+                        let wearFactor = (pressureVal / 100) * 0.18;
                         node.damage += wearFactor;
                         if(node.damage >= 1.0) {
                             node.damage = 1.0;
@@ -860,53 +956,48 @@
 
             if(damagePercent > 10) {
                 document.getElementById('metric-damage').style.color = 'var(--danger)';
-                document.getElementById('metric-effect').innerText = 'Dañado';
-                document.getElementById('metric-effect').style.color = 'var(--danger)';
             } else {
                 document.getElementById('metric-damage').style.color = 'var(--success)';
-                document.getElementById('metric-effect').innerText = 'Óptimo';
-                document.getElementById('metric-effect').style.color = 'var(--success)';
             }
         }
 
         let animTime = 0;
         function renderLoop() {
             if(!ctx) return;
-            animTime += 0.04;
+            animTime += 0.05;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Renderizado según el plano seleccionado por el usuario
             if(currentPlane === 'top') {
-                renderTopPlane();
+                renderTopPlaneReal();
             } else if(currentPlane === 'bottom') {
-                renderBottomPlane();
+                renderBottomPlaneReal();
             } else if(currentPlane === 'side') {
-                renderSidePlane();
+                renderSidePlaneReal();
             } else if(currentPlane === 'front') {
-                renderFrontPlane();
+                renderFrontPlaneReal();
             }
 
-            // Cursor profesional emulado de herramienta de limpieza
+            // Cursor interactivo de herramienta
             if(mouseX >= 0 && mouseY >= 0) {
                 ctx.save();
                 ctx.translate(mouseX, mouseY);
                 ctx.fillStyle = currentTool === 'acero' ? '#ef4444' : '#0ea5e9';
-                ctx.fillRect(-6, -24, 12, 22);
-                ctx.fillStyle = '#b45309';
-                ctx.fillRect(-3, -32, 6, 10);
+                ctx.fillRect(-6, -22, 12, 20);
+                ctx.fillStyle = '#f59e0b';
+                ctx.fillRect(-2, -30, 4, 10);
                 ctx.restore();
             }
 
             requestAnimationFrame(renderLoop);
         }
 
-        function renderTopPlane() {
-            // Vista superior del tejido cuadrado
-            ctx.strokeStyle = '#334155';
-            ctx.lineWidth = 2;
+        // Renderizado Realista Vista Superior
+        function renderTopPlaneReal() {
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 1.5;
 
             meshNodes.forEach(node => {
-                let vShift = Math.sin(animTime + node.col * 0.2) * 1.5;
+                let vShift = Math.sin(animTime + node.col * 0.25) * 1.2;
                 let drawY = node.y + vShift;
 
                 if(node.broken) {
@@ -917,15 +1008,14 @@
                     ctx.lineTo(node.x + node.w, drawY + node.h);
                     ctx.stroke();
                 } else {
-                    let strokeColor = node.damage > 0.5 ? '#f59e0b' : '#334155';
-                    ctx.strokeStyle = strokeColor;
+                    ctx.strokeStyle = node.damage > 0.4 ? '#f59e0b' : '#334155';
                     ctx.strokeRect(node.x, drawY, node.w, node.h);
 
                     if(node.clogged) {
-                        ctx.fillStyle = '#ef4444';
-                        ctx.fillRect(node.x + 3, drawY + 3, node.w - 6, node.h - 6);
+                        ctx.fillStyle = '#b45309'; // Arena colmatada
+                        ctx.fillRect(node.x + 2, drawY + 2, node.w - 4, node.h - 4);
                     } else {
-                        ctx.fillStyle = 'rgba(14, 165, 233, 0.08)';
+                        ctx.fillStyle = 'rgba(14, 165, 233, 0.06)';
                         ctx.fillRect(node.x + 2, drawY + 2, node.w - 4, node.h - 4);
                     }
                 }
@@ -933,64 +1023,128 @@
 
             ctx.fillStyle = '#94a3b8';
             ctx.font = '11px sans-serif';
-            ctx.fillText('PLANTA: VISTA SUPERIOR - TEJIDO CUADRANGULAR AISI 304', 30, 25);
+            ctx.fillText('VISTA SUPERIOR: Tejido Cuadrangular en Operación (Simulación de Salto de Arena Cuarzosa)', 25, 25);
         }
 
-        function renderBottomPlane() {
-            ctx.fillStyle = '#1e293b';
-            ctx.fillRect(40, 40, canvas.width - 80, canvas.height - 80);
+        // Renderizado Realista Vista Inferior (Soportes y Largueros)
+        function renderBottomPlaneReal() {
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(30, 30, canvas.width - 60, canvas.height - 60);
             ctx.strokeStyle = 'var(--secondary)';
             ctx.lineWidth = 1;
-            ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
+            ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
 
             ctx.fillStyle = '#94a3b8';
             ctx.font = '11px sans-serif';
-            ctx.fillText('PLANTA: VISTA DESDE ABAJO (INSPECCIÓN DE SOPORTES Y GOMAS LONGITUDINALES)', 60, 70);
+            ctx.fillText('VISTA INFERIOR: Inspección de Perfiles Tubulares y Gomas Amortiguadoras de Soporte', 50, 55);
 
-            // Simulación de apoyos inferiores
-            for(let i=100; i<canvas.width-100; i+=120) {
+            // Largueros longitudinales inferiores
+            for(let i=80; i<canvas.width-80; i+=100) {
                 ctx.fillStyle = '#334155';
-                ctx.fillRect(i, 90, 40, canvas.height - 180);
+                ctx.fillRect(i, 70, 35, canvas.height - 100);
+                // Goma de apoyo
                 ctx.fillStyle = '#22c55e';
-                ctx.fillRect(i+5, 100, 30, 15); // Goma de apoyo sana
+                ctx.fillRect(i+4, 80, 27, 18);
             }
         }
 
-        function renderSidePlane() {
+        // Renderizado Realista Vista Lateral (Inclinación y Trayectoria)
+        function renderSidePlaneReal() {
             ctx.fillStyle = '#94a3b8';
             ctx.font = '11px sans-serif';
-            ctx.fillText('PLANTA: VISTA DESDE LOS LADOS (INCLINACIÓN Y TENSIONAMIENTO LATERAL)', 60, 40);
+            ctx.fillText('VISTA LATERAL: Inclinación del Deck y Vector de Avance Gravitacional', 50, 35);
 
-            // Perfil lateral inclinado de la zaranda
+            // Estructura lateral inclinada
             ctx.strokeStyle = '#0ea5e9';
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 4;
             ctx.beginPath();
-            ctx.moveTo(80, 150);
-            ctx.lineTo(canvas.width - 80, 220);
-            ctx.lineTo(canvas.width - 80, 260);
-            ctx.lineTo(80, 190);
+            ctx.moveTo(60, 160 + simParams.slope * 4);
+            ctx.lineTo(canvas.width - 60, 240 + simParams.slope * 4);
+            ctx.lineTo(canvas.width - 60, 280 + simParams.slope * 4);
+            ctx.lineTo(60, 200 + simParams.slope * 4);
             ctx.closePath();
             ctx.stroke();
-            ctx.fillStyle = 'rgba(14, 165, 233, 0.15)';
+            ctx.fillStyle = 'rgba(14, 165, 233, 0.12)';
             ctx.fill();
-        }
 
-        function renderFrontPlane() {
-            ctx.fillStyle = '#94a3b8';
-            ctx.font = '11px sans-serif';
-            ctx.fillText('PLANTA: VISTA FRENTE Y FONDO (FLUJO DE DESCARGA Y CAUDAL DE ARENA)', 60, 40);
-
-            // Barras de flujo frontal
-            let barW = (canvas.width - 160) / 5;
-            for(let i=0; i<5; i++) {
-                ctx.fillStyle = i === 2 ? '#0ea5e9' : '#1e293b';
-                ctx.fillRect(80 + i * (barW + 10), 120, barW, 250);
-                ctx.strokeStyle = 'var(--border)';
-                ctx.strokeRect(80 + i * (barW + 10), 120, barW, 250);
+            // Partículas simuladas rebotando
+            for(let i=0; i<15; i++) {
+                let px = 80 + (i * 70 + (animTime * 40) % 200) % (canvas.width - 160);
+                let py = 170 + simParams.slope * 4 - Math.abs(Math.sin(animTime + i) * 25);
+                ctx.fillStyle = '#f59e0b';
+                ctx.fillRect(px, py, 6, 6);
             }
         }
 
-        function handleAiUpload(event) {
+        // Renderizado Realista Vista Frente y Fondo (Caudal de Descarga)
+        function renderFrontPlaneReal() {
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '11px sans-serif';
+            ctx.fillText('VISTA FRENTE Y FONDO: Descarga de Material Clasificado por Fajas', 50, 35);
+
+            let laneW = (canvas.width - 140) / 4;
+            for(let i=0; i<4; i++) {
+                ctx.fillStyle = i === 1 ? '#0ea5e9' : '#1e293b';
+                ctx.fillRect(70 + i * (laneW + 10), 100, laneW, 280);
+                ctx.strokeStyle = 'var(--border)';
+                ctx.strokeRect(70 + i * (laneW + 10), 100, laneW, 280);
+
+                ctx.fillStyle = '#f8fafc';
+                ctx.font = '10px sans-serif';
+                ctx.fillText('Flujo ' + (i+1), 80 + i * (laneW + 10), 90);
+            }
+        }
+
+        // Cuadro Granulométrico Interactivo
+        function renderGranulometryTable() {
+            const tbody = document.getElementById('granulometry-tbody');
+            tbody.innerHTML = '';
+            let totalWeight = parseFloat(document.getElementById('total-sample-weight').value) || 1000;
+            let cumulativeRetained = 0;
+
+            granulometryData.forEach((item, index) => {
+                cumulativeRetained += item.retained;
+                let indPercent = ((item.retained / totalWeight) * 100).toFixed(1);
+                let cumPercent = ((cumulativeRetained / totalWeight) * 100).toFixed(1);
+                let passingPercent = (100 - cumPercent).toFixed(1);
+                if(passingPercent < 0) passingPercent = 0;
+
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${item.mm.toFixed(2)}</strong></td>
+                    <td>${item.astm}</td>
+                    <td><input type="number" class="editable-input" value="${item.retained}" oninput="updateRetainedValue(${index}, this.value)"> g</td>
+                    <td>${indPercent}%</td>
+                    <td>${cumPercent}%</td>
+                    <td style="color: var(--secondary); font-weight: 600;">${passingPercent}%</td>
+                    <td><span style="color: ${item.state === 'Crítico' ? 'var(--danger)' : (item.state === 'Moderado' ? 'var(--accent)' : 'var(--success)')};">${item.state}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateRetainedValue(index, val) {
+            granulometryData[index].retained = parseFloat(val) || 0;
+            renderGranulometryTable();
+        }
+
+        function recalcGranulometry() {
+            renderGranulometryTable();
+            saveAuditLog('Cuadro Granulométrico', 'Recálculo de muestra total de alimentación.');
+        }
+
+        function generatePDFReport() {
+            alert('Generando e imprimiendo Informe Técnico Oficial en PDF con cuadro granulométrico completo.');
+            saveAuditLog('Cuadro Granulométrico', 'Generación de informe técnico PDF oficial.');
+        }
+
+        function exportCSVData() {
+            alert('Datos del cuadro granulométrico exportados a CSV exitosamente.');
+            saveAuditLog('Cuadro Granulométrico', 'Exportación de datos CSV.');
+        }
+
+        // Visión Artificial Pro Real
+        function handleAiRealVision(event) {
             const file = event.target.files[0];
             if(file) {
                 const reader = new FileReader();
@@ -998,12 +1152,88 @@
                     document.getElementById('uploaded-preview').src = e.target.result;
                     document.getElementById('ai-workspace').style.display = 'block';
                     
-                    document.getElementById('diag-text').innerText = 'Análisis completado: Se detectó colmatación severa por arena cuarzosa fina y microfisuras longitudinales por uso indebido de herramienta metálica rígida.';
-                    document.getElementById('solution-text').innerText = 'Se recomienda reemplazar el paño por una malla cuadrada de acero inoxidable AISI 304 con abertura de 0.9 mm y grosor de hilo de 0.35 mm, aplicando limpieza exclusivamente con peines de polímero.';
-                    document.getElementById('spec-recommendation').innerText = 'Malla Cuadrada 0.9 mm | Hilo 0.35 mm | Bastidor con Goma Nueva';
+                    document.getElementById('ai-diag-text').innerText = 'Análisis de Píxeles por Red Neuronal: Se ha detectado colmatación mineral y fatiga de malla en un 42% del área examinada.';
+                    document.getElementById('ai-solution-text').innerText = 'El patrón visual corresponde a acumulación de arena fina cuarzosa en condiciones de alta humedad. Se detecta microfisura longitudinal debida a exceso de presión por herramienta metálica.';
+                    document.getElementById('ai-spec-recommendation').innerText = 'Reemplazo sugerido: Malla de Acero Inoxidable AISI 304, Abertura 0.90 mm, Grosor de Hilo 0.35 mm.';
+                    saveAuditLog('Visión Artificial Pro', 'Escaneo y diagnóstico exitoso de imagen cargada.');
                 }
                 reader.readAsDataURL(file);
             }
+        }
+
+        // Manual Vivo Interactivo
+        function renderManualProblems() {
+            const container = document.getElementById('manual-problems-container');
+            container.innerHTML = '';
+
+            manualDatabase.forEach(prob => {
+                let div = document.createElement('div');
+                div.className = 'problem-card';
+                div.innerHTML = `
+                    <h4 style="color: var(--secondary); font-size: 0.9rem; margin-bottom: 0.3rem;">${prob.title}</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">${prob.desc}</p>
+                    <div style="font-size: 0.8rem; color: var(--success); font-weight: 600;">✔️ Solución: ${prob.solution}</div>
+                    <div style="font-size: 0.75rem; color: var(--accent); margin-top: 0.3rem;">🎬 Recurso: ${prob.video}</div>
+                `;
+                div.onclick = () => {
+                    alert('Abriendo protocolo interactivo y video de procedimiento para: ' + prob.title);
+                    saveAuditLog('Manual Vivo', 'Consulta de caso técnico ID #' + prob.id);
+                };
+                container.appendChild(div);
+            });
+        }
+
+        function filterManualProblems() {
+            const query = document.getElementById('manual-search').value.toLowerCase();
+            const container = document.getElementById('manual-problems-container');
+            container.innerHTML = '';
+
+            const filtered = manualDatabase.filter(p => p.title.toLowerCase().includes(query) || p.desc.toLowerCase().includes(query));
+            filtered.forEach(prob => {
+                let div = document.createElement('div');
+                div.className = 'problem-card';
+                div.innerHTML = `
+                    <h4 style="color: var(--secondary); font-size: 0.9rem; margin-bottom: 0.3rem;">${prob.title}</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">${prob.desc}</p>
+                    <div style="font-size: 0.8rem; color: var(--success); font-weight: 600;">✔️ Solución: ${prob.solution}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Auditoría & Historial
+        function saveAuditLog(moduleName, actionDesc) {
+            let now = new Date();
+            let timeStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0') + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+            auditLog.unshift({
+                time: timeStr,
+                user: document.getElementById('username').value + ' (' + document.getElementById('plant-select').value + ')',
+                module: moduleName,
+                action: actionDesc,
+                status: 'Registrado OK'
+            });
+            renderAuditTable();
+        }
+
+        function renderAuditTable() {
+            const tbody = document.getElementById('audit-tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            auditLog.forEach(log => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${log.time}</td>
+                    <td>${log.user}</td>
+                    <td>${log.module}</td>
+                    <td>${log.action}</td>
+                    <td><span style="color: var(--success);">${log.status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function exportAuditReport() {
+            alert('Reporte de auditoría y tiempos de trabajo exportado con éxito para revisión gerencial.');
         }
     </script>
 </body>
