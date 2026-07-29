@@ -471,22 +471,20 @@
     <!-- PANTALLA DE ACCESO -->
     <div id="login-screen">
         <div class="login-card">
-            <h2>Tecmaq Ingeniería 2.0</h2>
+            <h2>AET PARANA</h2>
             <p style="text-align: center; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.5rem;">Plataforma Certificada de Áridos con IA Dinámica</p>
             <div class="form-group">
                 <label>Usuario Operativo / Supervisor</label>
-                <input type="text" id="username" value="director.operaciones">
+                <input type="text" id="username" value="AET PARANA">
             </div>
             <div class="form-group">
                 <label>Clave de Autorización</label>
-                <input type="password" id="password" value="tecmaq2.0">
+                <input type="password" id="password" value="AET PARANA">
             </div>
             <div class="form-group">
                 <label>Planta / Sector</label>
                 <select id="plant-select">
-                    <option value="parana">Planta Paraná - Arenas Vaca Muerta</option>
-                    <option value="ibiza">Planta Ibiza - Promoción Áridos</option>
-                    <option value="cordoba">Planta Córdoba - Gravas Especiales</option>
+                    <option value="AET PARANA" selected>AET PARANA - Planta Central y Vaca Muerta</option>
                 </select>
             </div>
             <button class="btn" onclick="handleLogin()">Ingresar al Sistema</button>
@@ -501,7 +499,7 @@
                 <p>IA de Visión Dinámica por Hash Visual, Reportes Reales y Manual Vivo de Búsqueda</p>
             </div>
             <div class="user-status">
-                <span class="badge" id="active-plant-badge">Planta: Paraná</span>
+                <span class="badge" id="active-plant-badge">Planta: AET PARANA</span>
                 <button class="tool-btn" onclick="handleLogout()" style="border-color: var(--danger); color: var(--danger); background: transparent; margin-left: 1rem;">Cerrar Sesión</button>
             </div>
         </header>
@@ -742,7 +740,7 @@
         ];
 
         let auditLog = [
-            { time: '2026-07-29 11:00', user: 'director.operaciones (Paraná)', module: 'Visión Artificial Pro', action: 'Inicio de plataforma v2.0 con IA Dinámica', status: 'Normal' }
+            { time: '2026-07-29 11:00', user: 'AET PARANA', module: 'Visión Artificial Pro', action: 'Inicio de plataforma v2.0 con IA Dinámica', status: 'Normal' }
         ];
 
         let granulometryData = [
@@ -756,20 +754,18 @@
         ];
 
         function handleLogin() {
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-            const plant = document.getElementById('plant-select').value;
-            if(user && pass) {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('app-container').style.display = 'flex';
-                document.getElementById('active-plant-badge').innerText = 'Planta: ' + plant.toUpperCase();
-                initCanvas();
-                renderGranulometryTable();
-                filterManualProblems();
-                renderAuditTable();
-            } else {
-                alert('Ingrese credenciales válidas.');
-            }
+            // Forzar configuración fija de AET PARANA
+            document.getElementById('username').value = "AET PARANA";
+            document.getElementById('password').value = "AET PARANA";
+            document.getElementById('plant-select').value = "AET PARANA";
+
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-container').style.display = 'flex';
+            document.getElementById('active-plant-badge').innerText = 'Planta: AET PARANA';
+            initCanvas();
+            renderGranulometryTable();
+            filterManualProblems();
+            renderAuditTable();
         }
 
         function handleLogout() {
@@ -1113,7 +1109,7 @@
         }
 
         function exportReport(format) {
-            let plantName = document.getElementById('plant-select').value.toUpperCase();
+            let plantName = "AET PARANA";
             if(format === 'pdf') {
                 const printWindow = window.open('', '_blank');
                 printWindow.document.write('<html><head><title>Informe Técnico - Tecmaq 2.0</title></style></head><body style="font-family:sans-serif; padding:2rem;">');
@@ -1152,7 +1148,6 @@
                     document.getElementById('uploaded-preview').src = e.target.result;
                     document.getElementById('ai-workspace').style.display = 'block';
 
-                    // Análisis dinámico único basado en el nombre y características de la imagen subida
                     let fileName = file.name.toLowerCase();
                     let fileSize = file.size;
                     
@@ -1223,7 +1218,7 @@
             let timeStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0') + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
             auditLog.unshift({
                 time: timeStr,
-                user: document.getElementById('username').value + ' (' + document.getElementById('plant-select').value + ')',
+                user: 'AET PARANA',
                 module: moduleName,
                 action: actionDesc,
                 status: 'Registrado OK'
